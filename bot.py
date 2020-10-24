@@ -1,28 +1,35 @@
-import os
-
 import discord
-from discord.ext import commands
+intents = discord.Intents.default()
+intents.members = True
+
 from dotenv import load_dotenv
+import os
+load_dotenv('.env')
 
-load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+client = discord.Client(intents=intents)
+TOKEN = os.getenv('TOKEN')
 
-client = discord.Client()
-bot = commands.Bot(command_prefix="!", case_insensitive=True)
-
+def get_member_names():
+    for guild in client.guilds:
+        for member in guild.members:
+            yield member.name
 
 @client.event
 async def on_ready():
-    print(f"{client.user} has connected to Discord!")
-    
-@bot.event
-async def on_ready():
-    print(f'{bot.user.name} has connected to Discord!')
+    print('We have logged in as {0.user}'.format(client))
 
-@bot.command(name="test")
-async def test(ctx, arg):
-    await ctx.send(arg)
-    
-# client.run(TOKEN)
-bot.run(TOKEN)
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
 
+    if message.content.startswith('$hello'):
+        await message.channel.send('Hello!')
+
+    if message.content.startswith('!members'):
+        people = set(get_member_names())
+        for person in people:
+            await message.channel.send(person)
+
+
+client.run(TOKEN)
