@@ -1,0 +1,7 @@
+{
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "",
+    "editor.cursorSmoothCaretAnimation": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.formatOnSave": true
+}
