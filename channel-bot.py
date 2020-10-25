@@ -2,11 +2,13 @@
 
 import os
 
+from discord import Member
+
 from sheetsEX import users_sheet, survey_sheet
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from bot import members
+# from bot import members
 
 # # Initializes Discord privileged gateway intents
 # intents = discord.Intents.default()
@@ -54,9 +56,10 @@ ready_members = []
 @bot.event
 async def on_ready():
     print("bot ready")
-    for member in members:
-        direct_message = await member.create_dm()
-        await direct_message.send(content="Start setup by sending \"!name\" followed by your name")
+    # for member in bot.get_all_members():
+    #     if type(member) is Member:
+    #         direct_message = await member.create_dm()
+    #         await direct_message.send(content="Start setup by sending \"!name\" followed by your name")
 
 @bot.command(name="name")
 async def name(ctx, *, arg):
@@ -116,9 +119,9 @@ async def create_channel(ctx):
 
 async def end_of_channel(new_channel):
     await new_channel.delete()
-    new_group = await bot.create_group(*ready_members)
+    # new_group = await bot.user.create_group(*ready_members)
     for member in ready_members:
         ready_members.remove(member)
-    new_group.send(content="Welcome! How was your meeting?")
+    # new_group.send(content="Welcome! How was your meeting?")
 
 bot.run(TOKEN)
