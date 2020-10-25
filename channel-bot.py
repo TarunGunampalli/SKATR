@@ -66,22 +66,21 @@ async def name(ctx, *, arg):
     id = ctx.message.author.id
     id = ctx.message.author.id
     cell = users_sheet.find(str(id))
-    users_sheet.update_cell(cell.row, cell.col + 2, arg)
+    users_sheet.update_cell(cell.row, cell.col + 3, arg)
     await ctx.send("Thanks! Continue setup by sending \"!email\" followed by your email")
 
 @bot.command(name="email")
 async def email(ctx, arg):
-    await ctx.send(arg)
     id = ctx.message.author.id
     cell = users_sheet.find(str(id))
-    users_sheet.update_cell(cell.row, cell.col + 3, arg)
+    users_sheet.update_cell(cell.row, cell.col + 4, arg)
     await ctx.send("Thanks! Return to your server to start meeting new people!")
 
     
 @bot.command(name="ready")
 async def get_ready(ctx):
     if already_ready(ctx.message.author, ready_members):
-        ctx.send("You're already ready")
+        await ctx.send("You're already ready")
     else:
         ready_members.append(ctx.message.author)
     cell = 0
@@ -95,7 +94,7 @@ async def cancel_ready(ctx):
     if already_ready(ctx.message.author, ready_members):
         ready_members.remove(ctx.message.author)
     else:
-        ctx.send("You can't call cancel without being ready")
+        await ctx.send("You can't call cancel without being ready")
 
 
 async def create_channel(ctx):
@@ -121,7 +120,10 @@ async def end_of_channel(new_channel):
     await new_channel.delete()
     # new_group = await bot.user.create_group(*ready_members)
     for member in ready_members:
+        direct_message = await member.create_dm()
+        await direct_message.send(content="Remember to go to the BumpBot App to fill out the survey!")
         ready_members.remove(member)
+
     # new_group.send(content="Welcome! How was your meeting?")
 
 bot.run(TOKEN)
