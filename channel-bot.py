@@ -8,12 +8,14 @@ def check_existing_channel(channel_name, guild):
         if channel_name == existing_channel.name:
             return True
     return False
-        
+
         
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 bot = commands.Bot(command_prefix="!", case_insensitive=True)
+
+ready_members = []
     
 @bot.event
 async def on_ready():
@@ -23,8 +25,15 @@ async def on_ready():
 async def test(ctx, arg):
     await ctx.send(arg)
     
-@bot.command(name="create")
-async def newChannel(ctx, *, arg):
+@bot.command(name="ready")
+async def get_ready(ctx):
+    ready_members.append(ctx)
+    if (len(ready_members) > 3):
+        create_channel(ctx, arg)
+
+
+async def create_channel(ctx, arg):
+    print("ran this")
     valid_name_num = 0
     channel_name = arg
     while check_existing_channel(channel_name, ctx.guild):
@@ -36,14 +45,11 @@ async def newChannel(ctx, *, arg):
     invite = await new_channel.create_invite()
     direct_message = await ctx.message.author.create_dm()
     await direct_message.send(content=invite)
-    
-    
     def check(*args):
         return len(new_channel.members) == 0
     await bot.wait_for('voice_state_update', check=check)
-    await new_channel.delete()
-    
-    
+    await new_channel.delete()  
+
 
 bot.run(TOKEN)
 
