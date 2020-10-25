@@ -1,7 +1,22 @@
+#!/usr/bin/python3
+
 import os
 
+from sheetsEX import users_sheet, survey_sheet
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from bot import members
+
+# # Initializes Discord privileged gateway intents
+# intents = discord.Intents.default()
+# intents.members = True
+# client = discord.Client(intents=intents)
+
+# names = []
+# ids = []
+# pfp_urls = []
+# members = []
 
 # checks to see if a channel with name channel_name already exists in the guild
 # the bot is currently in
@@ -21,7 +36,7 @@ def already_ready(new_ready, ready_members):
 
 # get the discord auth token from .env file
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("TOKEN")
 
 # create the discord bot with "!" to denote commands in discord messages
 bot = commands.Bot(command_prefix="!", case_insensitive=True)
@@ -30,9 +45,35 @@ bot = commands.Bot(command_prefix="!", case_insensitive=True)
 # ready
 ready_members = []
     
+# @client.event
+# async def on_ready():
+#     get_members()
+#     # client.loop.stop()
+#     # client.loop.close()
+
 @bot.event
 async def on_ready():
-    print(f'{bot.user.name} has connected to Discord!')
+    print("bot ready")
+    for member in members:
+        direct_message = await member.create_dm()
+        await direct_message.send(content="Start setup by sending \"!name\" followed by your name")
+
+@bot.command(name="name")
+async def name(ctx, *, arg):
+    id = ctx.message.author.id
+    id = ctx.message.author.id
+    cell = users_sheet.find(str(id))
+    users_sheet.update_cell(cell.row, cell.col + 2, arg)
+    await ctx.send("Thanks! Continue setup by sending \"!email\" followed by your email")
+
+@bot.command(name="email")
+async def email(ctx, arg):
+    await ctx.send(arg)
+    id = ctx.message.author.id
+    cell = users_sheet.find(str(id))
+    users_sheet.update_cell(cell.row, cell.col + 3, arg)
+    await ctx.send("Thanks! Return to your server to start meeting new people!")
+
     
 @bot.command(name="ready")
 async def get_ready(ctx):
@@ -40,6 +81,9 @@ async def get_ready(ctx):
         ctx.send("You're already ready")
     else:
         ready_members.append(ctx.message.author)
+    cell = 0
+    # while (cell != 1)
+    #     cell = survey_sheet.find(str(ctx.message.author.id))
     if (len(ready_members) >= 3):
         await create_channel(ctx)
 

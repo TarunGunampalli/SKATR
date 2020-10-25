@@ -8,3 +8,4 @@ creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', s
 client = gspread.authorize(creds)
 
 users_sheet = client.open("SKATRdb").get_worksheet(0)
+survey_sheet = client.open("SKATRdb").get_worksheet(2)
